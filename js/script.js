@@ -61,9 +61,9 @@
 
     , dir: 0
 
-    , goalX: 20
+    , goalX: null
 
-    , goalY: 20
+    , goalY: null
 
     , go: function (x, y) {
         me.goalX = x;
