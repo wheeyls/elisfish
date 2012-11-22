@@ -107,6 +107,7 @@
     $(document).on('mousedown', function (e) {
       f.go(e.pageX, e.pageY);
       track = true;
+      return false;
     });
 
     $(document).on('mouseup', function (e) {
