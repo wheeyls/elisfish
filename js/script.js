@@ -36,16 +36,16 @@
     }
 
     if (fish.y > 750) {
-      fish.y = 749;
-    }
-
-    if (fish.y < 500) {
-      fish.velY += 0.8;
+      fish.dir += 749;
     }
   }
 
   function checkCollision(fish) {
     stayOnBoard(fish);
+  }
+
+  function distanceBetween(x1, y1, x2, y2) {
+    return Math.sqrt(Math.pow((x2 - x1), 2) + Math.pow((y2 - y1), 2));
   }
 
   function fish() {
@@ -57,36 +57,37 @@
 
     , y: 650
 
-    , velX: 0
+    , vel: 0
 
-    , velY: 0
+    , dir: 0
 
-    , go: function (dir) {
-        var acc = me.y > 500 ? 0.2 : accel
-          , m = me.y > 500 ? 4 : max
-          ;
+    , goalX: 20
 
-        //if (me.y < 500) { return; }
-        switch (dir) {
-        case RIGHT:
-          me.velX = Math.min(me.velX + acc, m);
-          return false;
-        case LEFT:
-          me.velX = Math.max(me.velX - acc, -m);
-          return false;
-        case UP:
-          me.velY = Math.max(me.velY - acc, -m);
-          return false;
-        case DOWN:
-          me.velY = Math.min(me.velY + acc, m);
-          return false;
-        }
+    , goalY: 20
+
+    , go: function (x, y) {
+        me.goalX = x;
+        me.goalY = y;
       }
 
     , move: function () {
+        var tmpX
+          , tmpY
+          , dist
+          ;
+
         if (!checkCollision(me)) {
-          me.x += me.velX;
-          me.y += me.velY;
+          if (me.goalY !== null) {
+            me.dir = Math.atan2(me.goalY - me.y, me.goalX - me.x);
+            dist = distanceBetween(me.x, me.y, me.goalX, me.goalY);
+            me.vel = Math.min(dist / 10, max);
+          }
+
+          tmpX = me.vel * Math.cos(me.dir);
+          tmpY = me.vel * Math.sin(me.dir);
+
+          me.x += tmpX;
+          me.y += tmpY;
         }
       }
 
@@ -99,9 +100,23 @@
   }
 
   $(function () {
-    var f = fish();
-    $(document).on('keydown', function (e) {
-      return f.go(e.keyCode);
+    var f = fish()
+      , track = false
+      ;
+
+    $(document).on('mousedown', function (e) {
+      f.go(e.pageX, e.pageY);
+      track = true;
+    });
+
+    $(document).on('mouseup', function (e) {
+      track = false;
+      f.goalX = null;
+      f.goalY = null;
+    });
+
+    $(document).on('mousemove', function (e) {
+      track && f.go(e.pageX, e.pageY);
     });
 
     window.setInterval(function () {
