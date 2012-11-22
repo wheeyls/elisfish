@@ -1,84 +1,112 @@
-(function (global, $, _) {
+(function () {
   "use strict";
-  var sets
+
+  var UP = 38
+    , DOWN = 40
+    , LEFT = 37
+    , RIGHT = 39
+    , accel = 1
+    , max = 15
+    , start = rect(0, 500, 200, 300)
+    , end = rect(600, 500, 200, 300)
     ;
 
-  function toDate(value) {
-    var str = Object.prototype.toString.call(value);
-    return str === "[object Date]" ? value : new Date(value);
-  }
-
-  function set(opts) {
-    opts = opts || {};
-    opts.date && (opts.date = toDate(opts.date));
-
-    var me = $.extend({
-      exercise: null
-    , weight: null
-    , reps: 0
-    , date: new Date()
-    }, (opts));
+  function rect(x, y, width, height) {
+    var me = {
+      x: x
+    , y: y
+    , width: width
+    , height: height
+    };
 
     return me;
   }
 
-  function loadSets() {
-    var loaded = localStorage && localStorage.getItem('weight-sets');
-    loaded && (loaded = JSON.parse(loaded));
+  function stayOnBoard(fish) {
+    if (fish.x < 0) {
+      fish.x = 1;
+    }
 
-    sets = _(loaded).map(function (values) {
-      return set(values);
-    }) || [];
+    if (fish.y < 0) {
+      fish.y = 1;
+    }
+
+    if (fish.x > 750) {
+      fish.x = 749;
+    }
+
+    if (fish.y > 750) {
+      fish.y = 749;
+    }
+
+    if (fish.y < 500) {
+      fish.velY += 0.8;
+    }
   }
 
-  function saveSets() {
-    localStorage && localStorage.setItem('weight-sets', JSON.stringify(sets));
+  function checkCollision(fish) {
+    stayOnBoard(fish);
   }
 
-  function setFromForm(form) {
-    var $form = $(form)
-      , aSet
+  function fish() {
+    var me
       ;
 
-    aSet = set({
-      exercise: $form.find('[name="exercise"]').val()
-    , weight: $form.find('[name="weight"]').val()
-    , reps: $form.find('[name="reps"]').val()
-    });
+    me = {
+      x: 40
 
-    sets.push(aSet);
-  }
+    , y: 650
 
-  function renderSets() {
-    var liTmp = _.template($('#list-template').html())
-      , hdTmp = _.template($('#date-header').html())
-      , fullList = ''
-      , prevDay = -1
-      ;
+    , velX: 0
 
-    _(sets).forEach(function (val) {
-      var currDate = toDate(val.date);
-      if (prevDay !== currDate.getDay()) {
-        fullList += hdTmp(val);
+    , velY: 0
+
+    , go: function (dir) {
+        var acc = me.y > 500 ? 0.2 : accel
+          , m = me.y > 500 ? 4 : max
+          ;
+
+        //if (me.y < 500) { return; }
+        switch (dir) {
+        case RIGHT:
+          me.velX = Math.min(me.velX + acc, m);
+          return false;
+        case LEFT:
+          me.velX = Math.max(me.velX - acc, -m);
+          return false;
+        case UP:
+          me.velY = Math.max(me.velY - acc, -m);
+          return false;
+        case DOWN:
+          me.velY = Math.min(me.velY + acc, m);
+          return false;
+        }
       }
 
-      fullList += liTmp(val);
-      prevDay = currDate.getDay();
-    });
+    , move: function () {
+        if (!checkCollision(me)) {
+          me.x += me.velX;
+          me.y += me.velY;
+        }
+      }
 
-    $('#sets').html(fullList);
+    , render: function () {
+        $('#fish').css({top: me.y + "px", left: me.x + "px"});
+      }
+    };
+
+    return me;
   }
 
   $(function () {
-    $("#new").submit(function (e) {
-      setFromForm(this);
-      renderSets();
-      e.preventDefault();
-      this.reset();
-      window.setTimeout(saveSets, 0);
+    var f = fish();
+    $(document).on('keydown', function (e) {
+      return f.go(e.keyCode);
     });
 
-    loadSets();
-    renderSets();
+    window.setInterval(function () {
+      f.move();
+      f.render();
+    }, 100);
   });
-}(this, this.jQuery, this._));
+}());

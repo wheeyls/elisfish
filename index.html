@@ -1,40 +1,37 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Simple Log</title>
+  <title>Eli's Fish</title>
   <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'>
-  <meta name="apple-mobile-web-app-capable" content="yes" /> 
+  <meta name="apple-mobile-web-app-capable" content="yes" />
 
   <link rel="stylesheet" href="css/bootstrap.css">
+  <link rel="stylesheet" href="css/style.css">
   <script src="js/jquery.js"></script>
   <script src="js/underscore.js"></script>
   <script src="js/script.js"></script>
 </head>
 <body>
-  <form action="#" id="new">
-    <label for="exercise">Exercise</label>
-    <input name="exercise" autofocus>
-    <label for="weight">Weight</label>
-    <input name="weight" type="number" min="0">
-    <label for="reps">Reps</label>
-    <input name="reps" type="number" min="0">
-    <div>
-      <input type="submit">
+  <h2>Eli's Fish</h2>
+  <p>Arrow keys to move</p>
+  <div id="game" class="orange">
+    <div id="fish" class="red"></div>
+    <div id="start" class="blue lake">
     </div>
-  </form>
+    <div id="end" class="blue lake"> </div>
+  </div>
+<script type="text/javascript">
 
-  <h2>Sets</h2>
-  <ul id="sets"></ul>
+  var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-36521101-1']);
+      _gaq.push(['_trackPageview']);
 
-  <script type="x-template" id="date-header">
-    <li class="date">
-      <strong><%= date.toDateString() %></strong>
-    </li>
-  </script>
-  <script type="x-template" id="list-template">
-    <li class="set">
-      <strong><%= exercise %>:</strong> <%= weight %> X <%= reps %>
-    </li>
-  </script>
+        (function() {
+              var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+                  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+                      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+                        })();
+
+                        </script>
 </body>
 </html>
